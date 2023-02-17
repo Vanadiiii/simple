@@ -49,7 +49,7 @@ executables:
 
 tests:
   simple-test:
-    main: Spec.hs
+    main: ListHelperSpec.hs
     source-dirs: test
     ghc-options:
       - -threaded
