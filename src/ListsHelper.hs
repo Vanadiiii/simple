@@ -92,3 +92,66 @@ decodeModified = concatMap decodeHelper
   where
     decodeHelper (Single a) = [a]
     decodeHelper (Multiply n a) = replicate n a
+
+-- 13) Run-length encoding of a list (direct solution).
+--     Implement the so-called run-length encoding data compression method directly.
+--     I.e. don't explicitly create the sublists containing the duplicates, as in problem 9, but only count them.
+--     As in problem P11, simplify the result list by replacing the singleton lists (1 X) by X.
+encodeDirect :: Eq a => [a] -> [ListItem a]
+encodeDirect [] = []
+encodeDirect [x] = [Single x]
+encodeDirect (x : xs) = encodeIn (x, 1) xs
+  where
+    encodeIn (a, count) [] =
+      if count == 1
+        then [Single a]
+        else [Multiply count a]
+    encodeIn (a, count) (b : bs) =
+      if a == b
+        then encodeIn (a, count + 1) bs
+        else encodeIn (a, count) [] ++ encodeIn (b, 1) bs
+
+-- 14) Duplicate the elements of a list
+dupli :: [a] -> [a]
+dupli [] = []
+dupli (x : xs) = x : x : dupli xs
+
+-- 15) Replicate the elements of a list a given number of times
+repli :: [a] -> Int -> [a]
+repli [] _ = []
+repli (x : xs) n = repli' x n ++ repli xs n
+  where
+    repli' a 1 = [a]
+    repli' a m = a : repli' a (m -1)
+
+-- 16) Drop every N'th element from a list
+dropEvery :: [a] -> Int -> [a]
+dropEvery [] _ = []
+dropEvery xs n = dropEvery' 1 n xs
+  where
+    dropEvery' :: Int -> Int -> [a] -> [a]
+    dropEvery' _ _ [] = []
+    dropEvery' m coef (y : ys) =
+      if m /= coef
+        then y : dropEvery' (m + 1) coef ys
+        else dropEvery' 1 coef ys
+
+-- 17) Split a list into two parts; the length of the first part is given.
+--     Do not use any predefined predicates.
+split :: [a] -> Int -> ([a], [a])
+split [] _ = ([], [])
+split xs n = split' [] xs n
+  where
+    split' acc rest 0 = (acc, rest)
+    split' acc (y : ys) m = split' (acc ++ [y]) ys (m - 1)
+
+-- 18) Extract a slice from a list.
+--     Given two indices, i and k, the slice is the list containing the elements between the i'th and k'th element of the original list
+--     (both limits included). Start counting the elements with 1.
+slice :: [a] -> Int -> Int -> [a]
+slice [] _ _ = []
+slice (x : xs) 1 n =
+  if n == 0
+    then []
+    else x : slice xs 1 (n - 1)
+slice (_ : xs) f l = slice xs (f - 1) (l - 1)

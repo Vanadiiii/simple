@@ -16,6 +16,10 @@ main = do
         encodeTests,
         encodeModifiedTests,
         decodeModifiedTests,
+        encodeDirectTests,
+        dupliTests,
+        repliTests,
+        dropEveryTests,
         isPalindromeTests
       ]
 
@@ -153,3 +157,47 @@ decodeModifiedTests =
     decodeModifiedTest1 = TestCase . assertBool "decodeModified of [] is []" . null $ ListsHelper.decodeModified ([] :: [ListItem Int])
     decodeModifiedTest2 = TestCase . assertEqual "decodeModified of [Single 42] is [42]" [42] $ ListsHelper.decodeModified [Single 42]
     decodeModifiedTest3 = TestCase . assertEqual "decodeModified of [Multiply 2 3, Single 4, Single 5] is [3,3,4,5]" [3, 3, 4, 5] $ ListsHelper.decodeModified [Multiply 2 3, Single 4, Single 5]
+
+encodeDirectTests :: Test
+encodeDirectTests =
+  TestList
+    [ TestLabel "empty list" encodeDirectTest1,
+      TestLabel "list with single elem" encodeDirectTest2,
+      TestLabel "list with many elems" encodeDirectTest3
+    ]
+  where
+    encodeDirectTest1 = TestCase . assertBool "encodeDirect of [] is []" . null $ ListsHelper.encodeDirect ([] :: [Int])
+    encodeDirectTest2 = TestCase . assertEqual "encodeDirect of [42] is [Single 42]" [Single 42] $ ListsHelper.encodeDirect ([42] :: [Int])
+    encodeDirectTest3 = TestCase . assertEqual "encodeDirect of [3,3,4,5] is [Multiply 2 3, Single 4, Single 5]" [Multiply 2 3, Single 4, Single 5] $ ListsHelper.encodeDirect ([3, 3, 4, 5] :: [Int])
+
+dupliTests :: Test
+dupliTests =
+  TestList
+    [ TestLabel "empty list duplication" dupliTest1,
+      TestLabel "not empty list duplication" dupliTest2
+    ]
+  where
+    dupliTest1 = TestCase . assertEqual "dupli [] is []" [] $ ListsHelper.dupli ([] :: [Int])
+    dupliTest2 = TestCase . assertEqual "dupli [1, 2, 3] is [1,1,2,2,3,3]" [1, 1, 2, 2, 3, 3] $ ListsHelper.dupli [1, 2, 3]
+
+repliTests :: Test
+repliTests =
+  TestList
+    [ TestLabel "empty list replication" repliTest1,
+      TestLabel "not empty list replication 1" repliTest2,
+      TestLabel "not empty list replication 2" repliTest3
+    ]
+  where
+    repliTest1 = TestCase . assertEqual "repli [] _ is []" [] $ ListsHelper.repli ([] :: [Int]) 42
+    repliTest2 = TestCase . assertEqual "repli [1,2,3] 2 is [1,1,2,2,3,3]" [1, 1, 2, 2, 3, 3] $ ListsHelper.repli [1, 2, 3] 2
+    repliTest3 = TestCase . assertEqual "repli [1, 2, 3] 1 is [1,2,3]" [1, 2, 3] $ ListsHelper.repli [1, 2, 3] 1
+
+dropEveryTests :: Test
+dropEveryTests =
+  TestList
+    [ TestLabel "empty list dropping" dropEveryTest1,
+      TestLabel "not empty list dropping 1" dropEveryTest2
+    ]
+  where
+    dropEveryTest1 = TestCase . assertEqual "dropEvery [] _ is []" [] $ ListsHelper.dropEvery ([] :: [Int]) 42
+    dropEveryTest2 = TestCase . assertEqual "dropEvery [1,2,3] 2 is [1,3]" [1, 3] $ ListsHelper.dropEvery [1, 2, 3] 2
