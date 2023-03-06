@@ -228,7 +228,12 @@ rndPermutation xs = do
   where
     split'' :: [a] -> Int -> ([a], [a])
     split'' (_ : xs) 0 = ([], xs)
-    split'' (x : xs) n =
-      let (ys, zs) = split'' xs (n - 1)
+    split'' (x : ls) n =
+      let (ys, zs) = split'' ls (n - 1)
        in (x : ys, zs)
 
+-- 26) Generate the combinations of K distinct objects chosen from the N elements of a list
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
+combinations n xs =
+  [(xs !! i) : ls | i <- [0 .. length xs - 1], ls <- combinations (n - 1) (drop (i + 1) xs)]
