@@ -217,8 +217,18 @@ diffSelect size right
 -- 25) Generate a random permutation of the elements of a list.
 rndPermutation :: [a] -> IO [a]
 rndPermutation [] = return []
+rndPermutation [x] = return [x]
 rndPermutation xs = do
   randIdx <- randomRIO (0, length xs)
-  num <- xs !! randIdx
-  randomXs = rndPermutation $ splitAt num xs
-  return $  num : randomXs
+  let num = xs !! randIdx
+  let (left, right) = split'' xs randIdx
+  rndLeft <- rndPermutation left
+  rndRight <- rndPermutation right
+  return $ num : (rndLeft ++ rndRight)
+  where
+    split'' :: [a] -> Int -> ([a], [a])
+    split'' (_ : xs) 0 = ([], xs)
+    split'' (x : xs) n =
+      let (ys, zs) = split'' xs (n - 1)
+       in (x : ys, zs)
+
