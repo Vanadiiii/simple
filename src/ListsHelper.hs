@@ -1,5 +1,8 @@
 module ListsHelper (module ListsHelper) where
 
+import Control.Monad (replicateM)
+import System.Random
+
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
@@ -155,3 +158,67 @@ slice (x : xs) 1 n =
     then []
     else x : slice xs 1 (n - 1)
 slice (_ : xs) f l = slice xs (f - 1) (l - 1)
+
+-- 19) Rotate a list N places to the left.
+rotate :: [a] -> Int -> [a]
+rotate [] _ = []
+rotate xs 0 = xs
+rotate (x : xs) n
+  | n < 0 = rotate (xs ++ [x]) (n + 1)
+  | otherwise = rotate xs (n - 1) ++ [x]
+
+-- 20) Remove the K'th element from a list. (iteration from 0)
+removeAt :: Int -> [a] -> [a]
+removeAt _ [] = error "list's length less then removed element's index"
+removeAt n (x : xs)
+  | n == 0 = xs
+  | otherwise = x : removeAt (n - 1) xs
+
+-- 20) Remove the K'th element from a list. (iteration from 0)
+--     changed returned value
+removeAt' :: Int -> [a] -> (Maybe a, [a])
+removeAt' _ [] = (Nothing, [])
+removeAt' 0 (x : xs) = (Just x, xs)
+removeAt' n (x : xs) =
+  let (a, bs) = removeAt' (n - 1) xs
+   in (a, x : bs)
+
+-- 21) Insert an element at a given position into a list.
+insertAt :: a -> [a] -> Int -> [a]
+insertAt x xs 0 = x : xs
+insertAt _ [] n
+  | n > 0 = error "index is too big"
+  | otherwise = error "index is less then 0"
+insertAt a (x : xs) n = x : insertAt a xs (n - 1)
+
+-- 22) Create a list containing all integers within a given range.
+range :: Integer -> Integer -> [Integer]
+range l r
+  | r == l = [r]
+  | r < l = l : range (l - 1) r
+  | otherwise = l : range (l + 1) r
+
+-- 23) Extract a given number of randomly selected elements from a list.
+rndSelect :: [a] -> Int -> IO [a]
+rndSelect [] _ = return []
+rndSelect ls size
+  | size < 0 = error "N must be greater than zero."
+  | otherwise = do
+    positions <- replicateM size $ getStdRandom $ randomR (0, length ls - 1)
+    return . map (ls !!) $ positions
+
+-- 24) Lotto: Draw N different random numbers from the set 1..M.
+diffSelect :: Int -> Int -> IO [Int]
+diffSelect size right
+  | size == 0 = return []
+  | size < 0 = error "size less then 0"
+  | otherwise = replicateM size $ getStdRandom $ randomR (1, right)
+
+-- 25) Generate a random permutation of the elements of a list.
+rndPermutation :: [a] -> IO [a]
+rndPermutation [] = return []
+rndPermutation xs = do
+  randIdx <- randomRIO (0, length xs)
+  num <- xs !! randIdx
+  randomXs = rndPermutation $ splitAt num xs
+  return $  num : randomXs
