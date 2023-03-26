@@ -26,6 +26,8 @@ source-repository head
 library
   exposed-modules:
       ListsHelper
+      LogicHelper
+      MathHelper
   other-modules:
       Paths_simple
   hs-source-dirs:

@@ -37,3 +37,4 @@ primeFactors = helper 2
       | start == x = [x]
       | mod x start == 0 = (start :) $ helper start (div x start)
       | otherwise = helper (start + 1) x
+
